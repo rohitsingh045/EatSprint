@@ -142,11 +142,11 @@ const navigate = useNavigate()
         <div className="multi-fields">
           <input
             required
-            name="zipcode"
+            name="pincode"
             value={data.zipcode}
             onChange={onChangeHandler}
             type="text"
-            placeholder="Zip Code"
+            placeholder="Pin Code"
           />
           <input
             required
