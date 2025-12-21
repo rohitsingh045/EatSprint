@@ -67,9 +67,11 @@ const MyOrders = () => {
       doc.text(`Status: ${(order.status || 'Processing').toUpperCase()}`, 22, 98);
       
       // Bill To Box
-      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(230, 230, 230);
+      doc.setFillColor(255, 255, 255);
       doc.roundedRect(110, 60, 85, 45, 3, 3, 'FD');
       
+      doc.setTextColor(0, 0, 0);
       doc.setFontSize(11);
       doc.setFont('helvetica', 'bold');
       doc.text('Bill To', 117, 72);
