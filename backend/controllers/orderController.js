@@ -3,15 +3,19 @@ import userModel from '../models/userModel.js'
 
 import Stripe from "stripe";
 
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Initialize Stripe with error handling
+const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+if (!stripeKey) {
+  console.error("❌ STRIPE_SECRET_KEY is missing in environment variables");
+}
+const stripe = new Stripe(stripeKey);
 
 
 
 
 // placing user order for frontend
 const placeOrder = async (req, res) => {
-  const frontend_url = "http://localhost:5173";
+  const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173";
   try {
     // Persist order in DB with provided paymentMethod (default: online)
     const paymentMethod = req.body.paymentMethod || 'online';
@@ -57,9 +61,11 @@ const placeOrder = async (req, res) => {
     res.json({ success: true, session_url: session.url });
   } catch (error) {
     console.error("Order creation error:", error);
+    console.error("Stripe error details:", error.type, error.code, error.message);
     res.status(500).json({ 
       success: false, 
-      message: error.message || "Error creating order" 
+      message: error.message || "Error creating order",
+      stripeError: error.type || "unknown"
     });
   }
 };
@@ -80,7 +86,8 @@ const placeOrder = async (req, res) => {
    }
 
  }
- // user orders for frontend 
+
+ // user orders for frontend
 const userOrders = async (req, res) => {
   try {
     // Use req.userId instead of req.body.userId

@@ -9,6 +9,9 @@ import LoginPopup from './Components/LoginPopup/LoginPopup';
  import {useState} from 'react'
 import Verify from './pages/Verify/Verify';
 import MyOrders from './pages/MyOrders/MyOrders';
+import About from './pages/About/AboutNew';
+
+
 
 const App = () => {
 
@@ -27,6 +30,8 @@ const App = () => {
         <Route path='/order' element={<PlaceOrder/>} />
         <Route path='/verify' element={<Verify/>} />
         <Route path='/myorders'element={<MyOrders/>}/>
+        <Route path='/about'element={<About/>}/>
+       
       </Routes>
     </div>
     <Footer />
