@@ -5,37 +5,90 @@
   color: var(--muted);
   font-size: 16px;
 }
+.add h2{
+  color: #333;
+  font-size: 28px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
 .add form{
   gap: 20px;
+  background: var(--card);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+}
+.add-img-upload{
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.add-img-upload:hover{
+  transform: scale(1.02);
 }
 .add-img-upload img{
-  width: 120px;
+  width: 140px;
+  border-radius: 12px;
+  border: 2px dashed var(--border);
+  padding: 10px;
+  transition: border-color 0.3s;
+}
+.add-img-upload img:hover{
+  border-color: var(--accent);
 }
 .add-product-name, .add-product-description{
   width: max(40%,280px);
 }
 .add-product-name input ,.add-product-description textarea{
-  padding: 12px 12px;
-  border:1px solid var(--border);
-  border-radius:8px;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.3s;
+  background: #fafafa;
+}
+.add-product-name input:focus ,.add-product-description textarea:focus{
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--soft-accent);
 }
 .add-category-price{
   display: flex;
   gap: 20px;
 }
 .add-category-price select,.add-category-price input{
-  max-width: 140px;
-  padding: 10px 12px;
-  border:1px solid var(--border);
-  border-radius:8px;
+  max-width: 160px;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  transition: all 0.3s;
+  background: #fafafa;
+}
+.add-category-price select:focus,.add-category-price input:focus{
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--soft-accent);
 }
 .add-btn{
-  max-width: 140px;
+  max-width: 160px;
   border: none;
-  padding: 10px 14px;
+  padding: 14px 28px;
   background: linear-gradient(135deg,var(--accent),var(--accent-2));
   color: white;
   cursor: pointer;
-  border-radius:8px;
-  box-shadow: 0 8px 20px rgba(255,99,71,0.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(255,99,71,0.3);
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s;
+}
+.add-btn:hover:not(:disabled){
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(255,99,71,0.4);
+}
+.add-btn:disabled{
+  opacity: 0.6;
+  cursor: not-allowed;
 }

@@ -1,25 +1,91 @@
+.list{
+  margin-top: 30px;
+}
+.list > p{
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+}
+.search-box{
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 400px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.3s;
+  background: #fafafa;
+}
+.search-box:focus{
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--soft-accent);
+}
+.list-table{
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+}
 .list-table-format{
-    display: grid;
-    grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 15px;
-    border: 1px solid #cacaca;
-    font-size: 13px;
+  display: grid;
+  grid-template-columns: 0.5fr 2fr 1fr 1fr 0.8fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.list-table-format:hover:not(.title){
+  background: var(--soft-accent);
 }
 .list-table-format.title{
-    background-color: #f9f9f9;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  font-weight: 700;
+  color: #333;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .list-table-format img{
-    width: 50px;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.delete-btn{
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff4d4d, #ff3333);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(255,77,77,0.2);
+}
+.delete-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255,77,77,0.35);
+}
+.loading-text{
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: var(--muted);
 }
 @media(max-width:600px){
-
-    .list-table-format{
-        grid-template-columns: 1fr 3fr 1fr;
-        gap: 15px;
-    }
-    .list-table-format.title{
-        display: none;
-    }
+  .list-table-format{
+    grid-template-columns: 1fr 3fr 1fr;
+    gap: 15px;
+  }
+  .list-table-format.title{
+    display: none;
+  }
 }

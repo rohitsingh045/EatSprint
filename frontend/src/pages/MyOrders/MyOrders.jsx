@@ -280,38 +280,82 @@ const MyOrders = () => {
 
   return (
     <div className='my-orders'>
-      <h2>My Orders</h2>
+      <div className="orders-header">
+        <h2>📦 My Orders</h2>
+        <p className="orders-subtitle">Track and manage your delicious orders</p>
+      </div>
       <div className='container'>
         {data.length === 0 ? (
-          <p>No orders found. Start shopping to place your first order!</p>
+          <div className="empty-orders">
+            <div className="empty-icon">🛒</div>
+            <h3>No orders yet!</h3>
+            <p>Start shopping to place your first order</p>
+          </div>
         ) : (
           data.map((order) => (
             <div key={order._id} className='my-orders-order'>
-              <img src={assets.parcel_icon} alt="" />
+              <div className="order-icon-wrapper">
+                <img src={assets.parcel_icon} alt="" />
+                <span className={`status-badge ${order.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {order.status}
+                </span>
+              </div>
+              
               <div className="order-details">
-                <p className="order-items">
-                  {order.items.map((item, i) => (
-                    <span key={i}>
-                      {item.name} x {item.quantity}
-                      {i < order.items.length - 1 ? ", " : ""}
-                    </span>
-                  ))}
-                </p>
-                <p className="order-amount">₹{order.amount.toFixed(2)}</p>
-                <p className="order-date">
-                  {new Date(order.date).toLocaleDateString()}
-                </p>
+                <div className="order-header-info">
+                  <h3 className="order-id">Order #{order._id.slice(-8).toUpperCase()}</h3>
+                  <p className="order-date">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    {new Date(order.date).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                </div>
+                
+                <div className="order-items-wrapper">
+                  <p className="order-items">
+                    <span className="items-icon">🍽️</span>
+                    {order.items.map((item, i) => (
+                      <span key={i} className="item-tag">
+                        {item.name} × {item.quantity}
+                        {i < order.items.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+                
+                <div className="order-footer-info">
+                  <p className="order-amount">
+                    <span className="amount-label">Total:</span>
+                    <span className="amount-value">₹{order.amount.toFixed(2)}</span>
+                  </p>
+                  <p className="payment-method">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                      <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    {order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment'}
+                  </p>
+                </div>
+
                 <div className="order-status">
                   {trackedOrderId === order._id && (
-                    <>
+                    <div className="tracking-container">
                       <div className="progress-steps">
                         {(() => {
                           const steps = [
-                            'Placed',
-                            'Confirmed',
-                            'Prepared',
-                            'Out for delivery',
-                            'Delivered'
+                            { label: 'Placed', icon: '📝' },
+                            { label: 'Confirmed', icon: '✅' },
+                            { label: 'Prepared', icon: '👨‍🍳' },
+                            { label: 'Out for delivery', icon: '🚚' },
+                            { label: 'Delivered', icon: '🎉' }
                           ];
                           const idx = (() => {
                             const s = (order.status || '').toLowerCase();
@@ -324,25 +368,31 @@ const MyOrders = () => {
                           })();
 
                           return steps.map((step, i) => (
-                            <div key={step} className={`step ${i <= idx ? 'done' : ''}`}>
-                              <div className="step-dot">{i <= idx ? '✓' : i + 1}</div>
-                              <div className="step-label">{step}</div>
+                            <div key={step.label} className={`step ${i <= idx ? 'done' : ''} ${i === idx ? 'active' : ''}`}>
+                              <div className="step-connector" style={{ display: i === 0 ? 'none' : 'block' }}></div>
+                              <div className="step-dot">
+                                {i <= idx ? <span className="step-icon">{step.icon}</span> : <span className="step-number">{i + 1}</span>}
+                              </div>
+                              <div className="step-label">{step.label}</div>
                             </div>
                           ));
                         })()}
                       </div>
-                      <div style={{ marginTop: 8 }}><b>{order.status}</b></div>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
+
               <div className="order-actions">
                 <button
-                  className={`track-button ${order.status.toLowerCase()}`}
+                  className={`track-button ${order.status.toLowerCase().replace(/\s+/g, '-')}`}
                   disabled={order.status === "Delivered" || order.status === "Cancelled"}
                   onClick={() => setTrackedOrderId(trackedOrderId === order._id ? null : order._id)}
                 >
-                  {trackedOrderId === order._id ? 'Hide Track' : (order.status === 'Delivered' ? 'Delivered' : order.status === 'Cancelled' ? 'Cancelled' : 'Track Order')}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                  {trackedOrderId === order._id ? 'Hide Track' : (order.status === 'Delivered' ? '✓ Delivered' : order.status === 'Cancelled' ? '✕ Cancelled' : 'Track Order')}
                 </button>
                 <button
                   className="invoice-button"

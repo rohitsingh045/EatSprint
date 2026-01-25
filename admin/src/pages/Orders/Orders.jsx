@@ -7,25 +7,36 @@ import { assets, url, currency } from '../../assets/assets';
 const Order = () => {
 
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchAllOrders = async () => {
-    const response = await axios.get(`${url}/api/order/list`)
-    if (response.data.success) {
-      setOrders(response.data.data.reverse());
-    }
-    else {
-      toast.error("Error")
+    try {
+      const response = await axios.get(`${url}/api/order/list`)
+      if (response.data.success) {
+        setOrders(response.data.data.reverse());
+      }
+      else {
+        toast.error("Error")
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to fetch orders')
+    } finally {
+      setLoading(false);
     }
   }
 
   const statusHandler = async (event, orderId) => {
-    console.log(event, orderId);
-    const response = await axios.post(`${url}/api/order/status`, {
-      orderId,
-      status: event.target.value
-    })
-    if (response.data.success) {
-      await fetchAllOrders();
+    try {
+      const response = await axios.post(`${url}/api/order/status`, {
+        orderId,
+        status: event.target.value
+      })
+      if (response.data.success) {
+        await fetchAllOrders();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update status')
     }
   }
 
@@ -34,11 +45,26 @@ const Order = () => {
     fetchAllOrders();
   }, [])
 
+  const filteredOrders = orders.filter(order =>
+    order.address.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.address.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className='order add'>
-      <h3>Order Page</h3>
+      <h3>Order Management</h3>
+      {loading ? <p className="loading-text">Loading orders...</p> : (
+      <>
+      <input 
+        type="text" 
+        placeholder="Search by customer name or status..." 
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="search-box"
+      />
       <div className="order-list">
-        {orders.map((order, index) => (
+        {filteredOrders.map((order, index) => (
           <div key={index} className='order-item'>
             <img src={assets.parcel_icon} alt="" />
             <div>
@@ -72,6 +98,8 @@ const Order = () => {
           </div>
         ))}
       </div>
+      </>
+      )}
     </div>
   )
 }

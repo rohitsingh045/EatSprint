@@ -5,8 +5,8 @@ import profile_image from './profile_image.png'
 import upload_area from './upload_area.png'
 import parcel_icon from './parcel_icon.png'
 
-export const url = 'http://localhost:5001'
-export const currency = '₹'
+export const url = import.meta.env.VITE_API_URL || 'http://localhost:5001'
+export const currency = import.meta.env.VITE_CURRENCY || '₹'
 
 export const assets ={
     logo,

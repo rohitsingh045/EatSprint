@@ -4,7 +4,7 @@ import axios from "axios";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
-  const url = "http://localhost:5001";
+  const url = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
   const [token, setToken] = useState(null);
   const [food_list, setFoodList] = useState([]);

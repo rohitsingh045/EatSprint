@@ -107,7 +107,7 @@ const Navbar = ({ setShowLogin }) => {
           </a>
         </li>
         <li>
-          <a 
+          <a
             href='#footer' 
             onClick={() => {
               setMenu("contact");

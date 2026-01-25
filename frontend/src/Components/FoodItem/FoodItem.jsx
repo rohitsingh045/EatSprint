@@ -10,6 +10,16 @@ const FoodItem = ({ id, name, price, description, image }) => {
   const [isPopular, setIsPopular] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // Helper function to get correct image URL
+  const getImageUrl = (img) => {
+    // If image is already a full URL (starts with http), use it directly
+    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+      return img;
+    }
+    // Otherwise, it's an old local path, use the backend URL
+    return `${url}/images/${img}`;
+  };
+
   // Simulate determining if item is new or popular (you can replace this with real logic)
   useEffect(() => {
     // Random chance for demo - replace with real data
@@ -52,9 +62,13 @@ const FoodItem = ({ id, name, price, description, image }) => {
         {/* Image with loading placeholder */}
         <img 
           className='food-item-image' 
-          src={url + "/images/" + image} 
+          src={getImageUrl(image)} 
           alt={name}
           onLoad={handleImageLoad}
+          onError={(e) => {
+            console.error('Image load error for:', name, 'URL:', getImageUrl(image));
+            e.target.style.opacity = 0.3;
+          }}
           style={{
             opacity: imageLoaded ? 1 : 0.7,
             transition: 'opacity 0.3s ease'
