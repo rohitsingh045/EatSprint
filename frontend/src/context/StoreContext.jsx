@@ -147,6 +147,27 @@ const StoreContextProvider = (props) => {
     return count;
   };
 
+  // ✅ Clear cart after successful order
+  const clearCart = async () => {
+    setCartItems({});
+    if (token) {
+      try {
+        await axios.post(
+          `${url}/api/cart/clear`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      } catch (err) {
+        console.error("Clear cart error:", err.message);
+      }
+    }
+    localStorage.removeItem("cartItems");
+  };
+
   const contextValue = {
     food_list,
     cartItems,
@@ -155,6 +176,7 @@ const StoreContextProvider = (props) => {
     removeFromCart,
     getTotalCartAmount,
     getTotalCartItems,
+    clearCart,
     url,
     token,
     setToken,

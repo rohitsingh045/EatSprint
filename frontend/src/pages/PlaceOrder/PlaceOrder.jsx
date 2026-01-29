@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const PlaceOrder = () => {
-  const { getTotalCartAmount, token, food_list, cartItems, url } = useContext(StoreContext);
+  const { getTotalCartAmount, token, food_list, cartItems, url, clearCart } = useContext(StoreContext);
 
   const [data, setData] = useState({
     firstName: '',
@@ -63,6 +63,8 @@ const PlaceOrder = () => {
       if (response.data.success && response.data.session_url) {
         window.location.replace(response.data.session_url);
       } else if (response.data.success && response.data.cod) {
+        // Clear cart for COD order
+        await clearCart();
         // COD order placed — show confirmation banner (user can view orders)
         setCodConfirmation({ show: true, orderId: response.data.orderId, message: response.data.message || 'Order placed (Cash on Delivery).' });
         // Auto-navigate to My Orders after 4 seconds

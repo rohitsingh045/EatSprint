@@ -26,7 +26,6 @@ const {email,password} = req.body;
 
 
  } catch (error) {
-     console.log(error);
      res.json({success:false,message:"Error"})
  }
 

@@ -19,7 +19,6 @@ const Order = () => {
   }
 
   const statusHandler = async (event, orderId) => {
-    console.log(event, orderId);
     const response = await axios.post(`${url}/api/order/status`, {
       orderId,
       status: event.target.value

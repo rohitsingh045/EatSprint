@@ -1,6 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from '../models/userModel.js'
-
+import { sendOrderConfirmationEmail, sendOrderConfirmedEmail, sendOrderStatusUpdateEmail, sendOrderDeliveredThankYouEmail } from "../utils/emailService.js";
 import Stripe from "stripe";
 
 
@@ -27,6 +27,24 @@ const placeOrder = async (req, res) => {
     });
 
     await newOrder.save();
+
+    // Get user details for email
+    const user = await userModel.findById(req.userId);
+    
+    // Prepare order details for email
+    const orderDetails = {
+      orderId: newOrder._id,
+      firstName: req.body.address.firstName,
+      items: req.body.items,
+      amount: req.body.amount / 100,
+      address: req.body.address,
+      paymentMethod: paymentMethod,
+      payment: false,
+      status: paymentMethod === 'cod' ? 'COD - Pending' : 'Pending Confirmation'
+    };
+
+    // Send order confirmation email to user and admin
+    await sendOrderConfirmationEmail(user.email, orderDetails);
 
     // If payment method is COD, do not create a Stripe session — return success
     if (paymentMethod === 'cod') {
@@ -69,13 +87,29 @@ const placeOrder = async (req, res) => {
    try {
     if (success=="true") {
       await orderModel.findByIdAndUpdate(orderId,{payment:true});
+      
+      // Get order and user details for confirmation email
+      const order = await orderModel.findById(orderId);
+      const user = await userModel.findById(order.userId);
+      
+      const orderDetails = {
+        orderId: order._id,
+        firstName: order.address.firstName,
+        items: order.items,
+        amount: order.amount,
+        address: order.address,
+        paymentMethod: order.paymentMethod
+      };
+      
+      // Send order confirmed email
+      await sendOrderConfirmedEmail(user.email, orderDetails);
+      
       res.json({success:true,message:"paid"})
     }else{
       await orderModel.findByIdAndDelete(orderId);
       res.json({success:false,message:"not paid"})
     }
    } catch (error) {
-    console.log(error);
         res.json({ success: false, message: "Error" });
    }
 
@@ -103,7 +137,6 @@ const listOrders = async (req,res) =>{
     const orders = await orderModel.find({});
     res.json ({success:true,data:orders})
    } catch (error) {
-     console.log(error);
      res.json({success:false,message:"Error"})
      
    }
@@ -112,10 +145,29 @@ const listOrders = async (req,res) =>{
 // api for updating order status
  const updateStatus = async (req, res) => {
   try {
-    await orderModel.findByIdAndUpdate(req.body.orderId, { status: req.body.status });
+    const order = await orderModel.findByIdAndUpdate(req.body.orderId, { status: req.body.status }, { new: true });
+    
+    // Get user details and send status update email
+    const user = await userModel.findById(order.userId);
+    
+    const orderDetails = {
+      orderId: order._id,
+      firstName: order.address.firstName,
+      items: order.items,
+      amount: order.amount,
+      address: order.address
+    };
+    
+    // Send status update email
+    await sendOrderStatusUpdateEmail(user.email, orderDetails, req.body.status);
+    
+    // If order is delivered, send special thank you email
+    if (req.body.status === "Delivered") {
+      await sendOrderDeliveredThankYouEmail(user.email, orderDetails);
+    }
+    
     res.json({ success: true, message: "Status Updated" });
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: "Error" });
   }
 }
@@ -154,7 +206,6 @@ const cancelOrder = async (req, res) => {
     
     res.json({ success: true, message: "Order cancelled successfully" });
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: "Error cancelling order" });
   }
 }

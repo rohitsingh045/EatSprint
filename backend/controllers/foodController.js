@@ -2,9 +2,6 @@ import foodModel from '../models/foodModel.js'; // Import the foodModel
 import fs from 'fs'; // Import the file system module
 
 const addFood = async (req, res) => {
-    console.log("Request Body:", req.body); // Debug the request body
-    console.log("Uploaded File:", req.file); // Debug the uploaded file
-
     const { name, description, price, category } = req.body;
 
     if (!name || !description || !price || !category) {
@@ -28,7 +25,6 @@ const addFood = async (req, res) => {
         await food.save();
         res.json({ success: true, message: "Food Added" });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ success: false, message: "Error saving food" });
     }
 };
@@ -38,7 +34,6 @@ const listFood = async (req, res) => {
         const foods = await foodModel.find({});
         res.json({ success: true, data: foods })
     } catch (error) {
-        console.log(error)
         res.json({ success: false, message: "Error" })
 
     }
@@ -53,7 +48,6 @@ const removeFood = async(req,res) =>{
         await foodModel.findByIdAndDelete(req.body.id);
         res.json({success:true,message:"Food Removed"})
      } catch (error) {
-        console.log(error);
         res.json({success:false,message:"Error"})
      }
 }

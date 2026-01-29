@@ -9,7 +9,7 @@ const Verify = () => {
  const [searchParams,setSearchParams] = useSearchParams();
   const success = searchParams.get("success")
     const orderId = searchParams.get("orderId")
-    const {url} = useContext(StoreContext);
+    const {url, clearCart} = useContext(StoreContext);
     const navigate = useNavigate();
 
   const verifyPayment = async () => {
@@ -20,6 +20,8 @@ const Verify = () => {
     });
     
     if (response.data.success) {
+      // Clear cart after successful payment
+      await clearCart();
       // Small delay to ensure order is updated in database
       setTimeout(() => {
         navigate('/myorders');
