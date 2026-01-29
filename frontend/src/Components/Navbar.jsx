@@ -107,16 +107,17 @@ const Navbar = ({ setShowLogin }) => {
           </a>
         </li>
         <li>
-          <a 
-            href='#footer' 
+          <Link 
+            to='/contact' 
             onClick={() => {
               setMenu("contact");
               setMobileMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }} 
             className={menu === "contact" ? "active-link" : ""}
           >
             📞 Contact
-          </a>
+          </Link>
         </li>
       </ul>
 

@@ -6,6 +6,7 @@ import userRouter from './routes/userRoutes.js';
 import foodRouter from './routes/foodRoute.js';
 import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
+import contactRouter from './routes/contactRoute.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -33,6 +34,7 @@ app.use('/api/user', userRouter);
 app.use('/api/food', foodRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
+app.use('/api/contact', contactRouter);
 
 // Error handling middleware (optional but recommended)
 app.use((err, req, res, next) => {

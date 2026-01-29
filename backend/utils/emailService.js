@@ -429,14 +429,15 @@ const sendOrderDeliveredThankYouEmail = async (userEmail, orderDetails) => {
             color: #333; 
             margin: 0;
             padding: 0;
+            background: #f5f5f5;
           }
           .container { 
             max-width: 600px; 
-            margin: 0 auto; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 20px auto; 
+            background: white;
             padding: 0;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             overflow: hidden;
           }
           .header { 
@@ -447,36 +448,18 @@ const sendOrderDeliveredThankYouEmail = async (userEmail, orderDetails) => {
             position: relative;
           }
           .header h1 { 
-            margin: 0;
-            font-size: 32px;
+            margin: 10px 0;
+            font-size: 28px;
             font-weight: bold;
           }
           .emoji-large {
-            font-size: 60px;
-            margin: 20px 0;
+            font-size: 50px;
+            margin: 15px 0;
             display: block;
           }
           .content { 
-            padding: 40px 30px; 
+            padding: 30px 30px; 
             background: white;
-          }
-          .thank-you-box {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            border-left: 5px solid #ff6b6b;
-            padding: 25px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
-          }
-          .thank-you-box h2 {
-            color: #d63031;
-            margin-top: 0;
-            font-size: 24px;
-          }
-          .thank-you-box p {
-            margin: 10px 0;
-            font-size: 16px;
-            color: #555;
           }
           .order-summary {
             background: #f8f9fa;
@@ -502,28 +485,6 @@ const sendOrderDeliveredThankYouEmail = async (userEmail, orderDetails) => {
           .order-items li:last-child {
             border-bottom: none;
           }
-          .rating-section {
-            background: #e8f5e9;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: center;
-          }
-          .rating-section h3 {
-            color: #27ae60;
-            margin-top: 0;
-          }
-          .stars {
-            font-size: 40px;
-            letter-spacing: 5px;
-            margin: 15px 0;
-          }
-          .footer-message {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 14px;
-            color: #666;
-          }
           .button-section {
             text-align: center;
             margin: 30px 0;
@@ -531,85 +492,169 @@ const sendOrderDeliveredThankYouEmail = async (userEmail, orderDetails) => {
           .button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 30px;
+            padding: 12px 35px;
             text-decoration: none;
             border-radius: 5px;
             display: inline-block;
             font-weight: bold;
-          }
-          .footer { 
-            background: #f1f1f1; 
-            padding: 20px; 
-            text-align: center; 
-            font-size: 12px; 
-            color: #666;
-            border-top: 1px solid #ddd;
-          }
-          .footer p {
-            margin: 5px 0;
+            margin: 5px;
           }
           .divider {
             height: 2px;
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            margin: 20px 0;
+            margin: 30px 0;
+          }
+          .footer-thank-you {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+          }
+          .footer-thank-you::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -10%;
+            width: 120%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+          }
+          .footer-thank-you-content {
+            position: relative;
+            z-index: 2;
+          }
+          .thank-you-heading {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+          }
+          .thank-you-message {
+            font-size: 18px;
+            margin: 15px 0;
+            line-height: 1.8;
+            font-weight: 500;
+          }
+          .thank-you-emoji {
+            font-size: 40px;
+            margin: 10px 0;
+            display: block;
+          }
+          .rating-prompt {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+          }
+          .rating-prompt p {
+            margin: 5px 0;
+          }
+          .footer-info {
+            background: #f8f9fa;
+            padding: 25px 30px;
+            text-align: center;
+            color: #555;
+            border-top: 3px solid #667eea;
+          }
+          .footer-info h4 {
+            margin-top: 0;
+            color: #667eea;
+          }
+          .footer-info p {
+            margin: 8px 0;
+            font-size: 13px;
+          }
+          .discount-code {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+          }
+          .discount-code p {
+            margin: 5px 0;
+          }
+          .code {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6b00;
+            letter-spacing: 2px;
+          }
+          @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
           }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <span class="emoji-large">🎉</span>
-            <h1>Your Order is Delivered!</h1>
+            <span class="emoji-large">✅</span>
+            <h1>Order Delivered!</h1>
+            <p style="margin: 10px 0 0 0; font-size: 14px;">We hope you enjoyed your meal</p>
           </div>
           
           <div class="content">
             <p>Hi <strong>${orderDetails.firstName}</strong>,</p>
             
-            <div class="thank-you-box">
-              <h2>Thank You! 🙏</h2>
-              <p>We hope you enjoyed your delicious meal from <strong>EatSprint</strong>!</p>
-              <p style="font-size: 14px;">Your order has been successfully delivered.</p>
-            </div>
-
             <div class="order-summary">
               <h3>📦 Order Summary</h3>
-              <p><strong>Order ID:</strong> ${orderDetails.orderId.toString().slice(-8).toUpperCase()}</p>
+              <p><strong>Order ID:</strong> #${orderDetails.orderId.toString().slice(-8).toUpperCase()}</p>
               <p><strong>Delivered on:</strong> ${new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p><strong>Total Amount:</strong> <span style="color: #667eea; font-weight: bold;">₹${orderDetails.amount.toFixed(2)}</span></p>
+              <p><strong>Total Amount Paid:</strong> <span style="color: #667eea; font-weight: bold;">₹${orderDetails.amount.toFixed(2)}</span></p>
               
-              <h4 style="color: #555; margin-top: 15px;">Items Ordered:</h4>
+              <h4 style="color: #555; margin-top: 15px; margin-bottom: 10px;">Items Ordered:</h4>
               <ul class="order-items">
                 ${itemsHTML}
               </ul>
             </div>
 
-            <div class="rating-section">
-              <h3>⭐ Rate Your Experience</h3>
-              <p>We'd love to hear about your experience!</p>
-              <div class="stars">★★★★★</div>
-              <p style="font-size: 12px; margin: 10px 0;">Your feedback helps us improve!</p>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="footer-message">
-              <p><strong>Did you enjoy your meal?</strong></p>
-              <p>Order again soon! Next time use code <strong>WELCOME10</strong> for 10% off</p>
+            <div class="discount-code">
+              <p style="font-size: 13px; margin: 5px 0;">🎁 Next Order Discount:</p>
+              <div class="code">WELCOME10</div>
+              <p style="font-size: 12px; margin: 5px 0; color: #666;">Get 10% off on your next order!</p>
             </div>
 
             <div class="button-section">
-              <a href="http://localhost:5173" class="button">📱 Order Again</a>
+              <a href="http://localhost:5173" class="button">🍔 Order Again Now</a>
+              <a href="http://localhost:5173/myorders" class="button">📋 View My Orders</a>
             </div>
-
-            <p style="font-size: 14px; color: #666; margin-top: 30px;">
-              <strong>Need Help?</strong> If you have any issues or feedback, feel free to reach out to our support team.
-            </p>
           </div>
 
-          <div class="footer">
-            <p><strong>EatSprint</strong> - Your Favorite Food Delivery Service 🍔</p>
-            <p>Thank you for choosing us! We appreciate your business.</p>
-            <p>&copy; 2024 EatSprint. All rights reserved.</p>
+          <div class="divider"></div>
+
+          <div class="footer-thank-you">
+            <div class="footer-thank-you-content">
+              <span class="thank-you-emoji">🙏❤️</span>
+              <h2 class="thank-you-heading">Thank You!</h2>
+              <p class="thank-you-message">
+                We truly appreciate your business and trust in EatSprint!
+              </p>
+              <p class="thank-you-message">
+                Your feedback means the world to us. Please take a moment to rate your experience.
+              </p>
+              <div class="rating-prompt">
+                <p>⭐ How was your order?</p>
+                <p style="font-size: 12px;">Your ratings help us serve you better</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-info">
+            <h4>Got Feedback?</h4>
+            <p>We'd love to hear from you! Your comments help us improve our service.</p>
+            <p style="font-size: 12px; color: #999; margin-top: 15px;">
+              📧 Email: support@eatsprint.com | 📞 Call: 1800-EATSPRINT
+            </p>
+            <p style="font-size: 11px; color: #bbb; margin-top: 20px;">
+              &copy; 2024 EatSprint | All rights reserved | <a href="#" style="color: #667eea; text-decoration: none;">Privacy Policy</a>
+            </p>
           </div>
         </div>
       </body>
@@ -620,7 +665,7 @@ const sendOrderDeliveredThankYouEmail = async (userEmail, orderDetails) => {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: userEmail,
-      subject: `🎉 Thank You for Your Order - Order #${orderDetails.orderId.toString().slice(-8).toUpperCase()}`,
+      subject: `🙏 Thank You for Your Order - Order #${orderDetails.orderId.toString().slice(-8).toUpperCase()}`,
       html: emailHTML,
     });
     console.log(`✅ Thank you email sent to user: ${userEmail}`);
@@ -629,9 +674,234 @@ const sendOrderDeliveredThankYouEmail = async (userEmail, orderDetails) => {
   }
 };
 
+// Send contact form submission to admin
+const sendContactFormEmail = async (contactData) => {
+  const adminEmails = (process.env.ADMIN_EMAIL || "")
+    .split(",")
+    .map((email) => email.trim())
+    .filter((email) => email);
+
+  const emailHTML = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+          }
+          .container { 
+            max-width: 600px; 
+            margin: 20px auto; 
+            background: white;
+            padding: 0;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+          }
+          .header { 
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
+            color: white; 
+            padding: 30px 20px; 
+            text-align: center;
+          }
+          .header h1 { 
+            margin: 10px 0;
+            font-size: 28px;
+            font-weight: bold;
+          }
+          .emoji-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+          }
+          .content { 
+            padding: 30px 30px; 
+            background: white;
+          }
+          .alert-box {
+            background: #FFF3CD;
+            border: 2px solid #FFC107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #856404;
+            font-weight: 500;
+          }
+          .form-data {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+          }
+          .form-field {
+            margin-bottom: 18px;
+          }
+          .form-field:last-child {
+            margin-bottom: 0;
+          }
+          .field-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: block;
+          }
+          .field-value {
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #FF6B6B;
+            padding-left: 12px;
+          }
+          .message-section {
+            background: #e8e8ff;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+          }
+          .message-section h3 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 16px;
+          }
+          .message-content {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+          }
+          .action-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+          }
+          .action-box p {
+            margin: 8px 0;
+            font-size: 14px;
+          }
+          .footer { 
+            background: #f1f1f1; 
+            padding: 20px; 
+            text-align: center; 
+            font-size: 12px; 
+            color: #666;
+            border-top: 1px solid #ddd;
+          }
+          .timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <span class="emoji-icon">📬</span>
+            <h1>New Contact Form Submission</h1>
+            <p style="margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Someone has filled out the contact form</p>
+          </div>
+          
+          <div class="content">
+            <div class="alert-box">
+              ⚡ Action Required: Please review and respond to this message
+            </div>
+
+            <div class="form-data">
+              <div class="form-field">
+                <span class="field-label">📝 Full Name</span>
+                <div class="field-value">${contactData.name}</div>
+              </div>
+
+              <div class="form-field">
+                <span class="field-label">📧 Email Address</span>
+                <div class="field-value"><a href="mailto:${contactData.email}" style="color: #667eea; text-decoration: none;">${contactData.email}</a></div>
+              </div>
+
+              <div class="form-field">
+                <span class="field-label">📞 Phone Number</span>
+                <div class="field-value">${contactData.phone || 'Not provided'}</div>
+              </div>
+
+              <div class="form-field">
+                <span class="field-label">🎯 Subject</span>
+                <div class="field-value">${contactData.subject}</div>
+              </div>
+            </div>
+
+            <div class="message-section">
+              <h3>💬 Customer's Message:</h3>
+              <div class="message-content">${contactData.message}</div>
+            </div>
+
+            <div class="action-box">
+              <p>Please respond to the customer within 24 hours</p>
+              <p style="font-size: 12px; opacity: 0.9;">Reply directly to: <strong>${contactData.email}</strong></p>
+            </div>
+
+            <div class="timestamp">
+              <strong>Submitted at:</strong> ${new Date().toLocaleString('en-IN', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+              })}
+            </div>
+          </div>
+
+          <div class="footer">
+            <p><strong>EatSprint Contact System</strong></p>
+            <p>This is an automated message from your contact form.</p>
+            <p>&copy; 2024 EatSprint. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  try {
+    // Send to all admin emails
+    for (const adminEmail of adminEmails) {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: adminEmail,
+        subject: `📬 New Contact Form: ${contactData.subject}`,
+        html: emailHTML,
+      });
+      console.log(`✅ Contact form email sent to admin: ${adminEmail}`);
+    }
+    return true;
+  } catch (error) {
+    console.error("❌ Email service error:", error.message);
+    return false;
+  }
+};
+
 export {
   sendOrderConfirmationEmail,
   sendOrderConfirmedEmail,
   sendOrderStatusUpdateEmail,
   sendOrderDeliveredThankYouEmail,
+  sendContactFormEmail,
 };
