@@ -3,7 +3,7 @@ import Navbar from './Components/Navbar';
 import { Route, Routes } from 'react-router-dom';
 import Footer from './Components/Footer/Footer';
 import LoginPopup from './Components/LoginPopup/LoginPopup';
-import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import ErrorBoundary from './Components/ErrorBoundary/ErrorBoundary';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
