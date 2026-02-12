@@ -2,9 +2,6 @@ import foodModel from '../models/foodModel.js';
 import { v2 as cloudinary } from 'cloudinary';
 
 const addFood = async (req, res) => {
-    console.log("Request Body:", req.body);
-    console.log("Uploaded File:", req.file);
-
     const { name, description, price, category } = req.body;
 
     if (!name || !description || !price || !category) {
@@ -17,8 +14,6 @@ const addFood = async (req, res) => {
     // Get Cloudinary URL from uploaded file
     let image_filename = req.file ? req.file.path : null;
 
-    console.log("🖼️ Cloudinary Image URL:", image_filename);
-
     const food = new foodModel({
         name,
         description,
@@ -29,10 +24,8 @@ const addFood = async (req, res) => {
 
     try {
         await food.save();
-        console.log("✅ Food saved to MongoDB with image:", image_filename);
         res.json({ success: true, message: "Food Added" });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ success: false, message: "Error saving food" });
     }
 };
@@ -43,7 +36,6 @@ const listFood = async (req, res) => {
         const foods = await foodModel.find({});
         res.json({ success: true, data: foods })
     } catch (error) {
-        console.log(error)
         res.json({ success: false, message: "Error" })
     }
 }
@@ -63,14 +55,13 @@ const removeFood = async(req, res) => {
             try {
                 await cloudinary.uploader.destroy(publicId);
             } catch (cloudinaryError) {
-                console.log('Cloudinary delete error:', cloudinaryError);
+                // Silently fail - image may not exist in Cloudinary
             }
         }
 
         await foodModel.findByIdAndDelete(req.body.id);
         res.json({success: true, message: "Food Removed"})
     } catch (error) {
-        console.log(error);
         res.json({success: false, message: "Error"})
     }
 }

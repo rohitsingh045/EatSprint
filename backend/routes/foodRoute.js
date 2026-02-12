@@ -13,9 +13,8 @@ try {
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_SECRET_KEY
   });
-  console.log('✅ Cloudinary configured');
 } catch (error) {
-  console.error('⚠️ Cloudinary config error:', error.message);
+  // Configuration error - will fail on upload
 }
 
 // Allowed file types

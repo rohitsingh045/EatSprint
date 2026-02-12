@@ -11,11 +11,6 @@ import orderRouter from './routes/orderRoute.js';
 
 dotenv.config();
 
-// Log environment for debugging
-console.log('🔧 Environment:', process.env.NODE_ENV);
-console.log('🔧 MongoDB:', process.env.MONGO_URL ? 'Set' : 'Missing');
-console.log('🔧 Cloudinary Name:', process.env.CLOUDINARY_NAME ? 'Set' : 'Missing');
-
 const app = express();
 const port = process.env.PORT || 5001;
 
@@ -49,66 +44,50 @@ app.use((req, res, next) => {
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Increased limit for development
+  max: 1000,
   message: { success: false, message: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
-  skip: (req) => process.env.NODE_ENV === 'development', // Skip in development
+  skip: (req) => process.env.NODE_ENV === 'development',
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // Increased for development
+  max: 100, // Limit login attempts
   message: { success: false, message: 'Too many login attempts, please try again after 15 minutes.' },
   skipSuccessfulRequests: true,
-  skip: (req) => process.env.NODE_ENV === 'development', // Skip in development
+  skip: (req) => process.env.NODE_ENV === 'development',
 });
 
-// Apply rate limiting to all routes (disabled in development)
 app.use(limiter);
 
 // Middleware
 app.use(express.json({ limit: '10mb' }));
 
-// CORS Configuration - More permissive for development
-const isDevelopment = process.env.NODE_ENV !== 'production';
-
-if (isDevelopment) {
-  // Development: Allow all localhost origins
-  app.use(cors({
-    origin: true,
-    credentials: true
-  }));
-  console.log('🔓 CORS: Development mode - All origins allowed');
-} else {
-  // Production: Whitelist specific domains
-  const allowedOrigins = [
+// CORS Configuration
+const allowedOrigins = [
     process.env.FRONTEND_URL,
     process.env.ADMIN_URL
-  ].filter(Boolean);
+].filter(Boolean);
 
-  const corsOptions = {
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) !== -1) {
+const corsOptions = {
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      // and allow all origins in development
+      if (!origin || process.env.NODE_ENV !== 'production' || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.log('❌ CORS blocked origin:', origin);
         callback(new Error('Not allowed by CORS'));
       }
     },
     credentials: true,
-    optionsSuccessStatus: 200
-  };
+};
 
-  app.use(cors(corsOptions));
-  console.log('🔒 CORS: Production mode - Whitelist enabled');
-}
+app.use(cors(corsOptions));
 
 // DB connection
 connectDB().catch(error => {
-  console.error('❌ Database connection failed:', error.message);
+  console.error('Database connection failed:', error.message);
 });
 
 // API routes
@@ -117,9 +96,8 @@ app.use('/api/food', foodRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/order', orderRouter);
 
-// Error handling middleware (optional but recommended)
+// Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({ 
     success: false, 
@@ -137,6 +115,6 @@ export default app;
 // Only listen on port if not in serverless environment  
 if (process.env.VERCEL !== '1') {
   app.listen(port, () => {
-    console.log(`🚀 Server started on http://localhost:${port}`);
+    console.log(`Server started on http://localhost:${port}`);
   });
 }

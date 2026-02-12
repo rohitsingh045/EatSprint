@@ -5,10 +5,21 @@ import Stripe from "stripe";
 
 // Initialize Stripe with error handling
 const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
+let stripe = null;
+let stripeEnabled = false;
+
 if (!stripeKey) {
-  console.error("❌ STRIPE_SECRET_KEY is missing in environment variables");
+  console.warn("⚠️  STRIPE_SECRET_KEY is missing - Online payments disabled");
+} else {
+  try {
+    stripe = new Stripe(stripeKey);
+    stripeEnabled = true;
+    console.log("✅ Stripe initialized successfully");
+  } catch (error) {
+    console.error("❌ Failed to initialize Stripe:", error.message);
+    stripeEnabled = false;
+  }
 }
-const stripe = new Stripe(stripeKey);
 
 
 
@@ -35,6 +46,16 @@ const placeOrder = async (req, res) => {
     // If payment method is COD, do not create a Stripe session — return success
     if (paymentMethod === 'cod') {
       return res.json({ success: true, cod: true, message: 'Order placed (COD)', orderId: newOrder._id });
+    }
+
+    // Check if Stripe is enabled for online payments
+    if (!stripeEnabled || !stripe) {
+      await orderModel.findByIdAndDelete(newOrder._id);
+      return res.status(503).json({ 
+        success: false, 
+        message: 'Online payment is temporarily unavailable. Please use Cash on Delivery.',
+        stripeDisabled: true
+      });
     }
 
     // Create line items for Stripe with correct amount in paise
