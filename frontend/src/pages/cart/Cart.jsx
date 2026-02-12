@@ -3,6 +3,7 @@ import './Cart.css'
 import { StoreContext } from '../../context/StoreContext'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { showToast } from '../../utils/toast'
 
 const Cart = () => {
   const {cartItems, food_list, removeFromCart, getTotalCartAmount, url, addToCart} = useContext(StoreContext);
@@ -10,16 +11,29 @@ const Cart = () => {
 
   const cartCount = food_list.filter(item => cartItems[item._id] > 0).length;
 
+  const getImageUrl = (img) => {
+    if (img && (img.startsWith('http://') || img.startsWith('https://'))) {
+      return img;
+    }
+    return `${url}/images/${img}`;
+  };
+
+  const handleRemoveItem = (item) => {
+    for(let i = 0; i < cartItems[item._id]; i++) {
+      removeFromCart(item._id);
+    }
+    showToast.success(`${item.name} removed from cart`);
+  };
+
   return (
     <div className='cart'>
       <div className="cart-header">
-        <h2>🛒 Shopping Cart</h2>
+        <h2>Shopping Cart</h2>
         <p className="cart-count">{cartCount} {cartCount === 1 ? 'item' : 'items'} in your cart</p>
       </div>
 
       {cartCount === 0 ? (
         <div className="empty-cart">
-          <div className="empty-cart-icon">🍽️</div>
           <h3>Your cart is empty</h3>
           <p>Add some delicious items to get started!</p>
           <button onClick={() => navigate('/')} className="browse-menu-btn">
@@ -44,7 +58,7 @@ const Cart = () => {
                   return (
                     <div key={item._id} className='cart-item-card'>
                       <div className="cart-item-image">
-                        <img src={url + "/images/" + item.image} alt={item.name} />
+                        <img src={getImageUrl(item.image)} alt={item.name} />
                       </div>
                       
                       <div className="cart-item-details">
@@ -78,12 +92,7 @@ const Cart = () => {
 
                       <div className="cart-item-remove">
                         <button 
-                          onClick={() => {
-                            // Remove all quantities
-                            for(let i = 0; i < cartItems[item._id]; i++) {
-                              removeFromCart(item._id);
-                            }
-                          }} 
+                          onClick={() => handleRemoveItem(item)} 
                           className='remove-btn'
                           title="Remove item"
                         >
@@ -106,7 +115,7 @@ const Cart = () => {
           <div className="cart-bottom">
             <div className="cart-promocode">
               <div className="promocode-card">
-                <h3>💳 Have a Promo Code?</h3>
+                <h3>Have a Promo Code?</h3>
                 <p>Enter your code to get special discounts</p>
                 <div className='cart-promocode-input'>
                   <input type="text" placeholder='Enter promo code' />

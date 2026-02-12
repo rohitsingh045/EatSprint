@@ -3,6 +3,8 @@ import './PlaceOrder.css';
 import { StoreContext, } from '../../context/StoreContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from '../../utils/toast';
+import { validateEmail, validatePhone } from '../../utils/helpers';
 
 
 const PlaceOrder = () => {
@@ -32,7 +34,17 @@ const PlaceOrder = () => {
     event.preventDefault();
 
     if (getTotalCartAmount() === 0) {
-      alert('Your cart is empty.');
+      showToast.error('Your cart is empty.');
+      return;
+    }
+
+    if (!validateEmail(data.email)) {
+      showToast.error('Please enter a valid email address');
+      return;
+    }
+
+    if (!validatePhone(data.phone)) {
+      showToast.error('Please enter a valid phone number');
       return;
     }
 
@@ -41,18 +53,17 @@ const PlaceOrder = () => {
         .filter((item) => cartItems[item._id] > 0)
         .map((item) => ({
           name: item.name,
-          price: Math.round(item.price * 100), // Convert to smallest currency unit (paise)
+          price: Math.round(item.price * 100),
           quantity: cartItems[item._id],
         }));
 
-         const orderData = {
+      const orderData = {
         address: data,
         items: orderItems,
-        amount: Math.round(getTotalCartAmount() * 100), // Convert to paise (no delivery fee)
-          paymentMethod,
+        amount: Math.round(getTotalCartAmount() * 100),
+        paymentMethod,
       };
 
-      // Only send Authorization header if token is valid
       const config = {};
       if (token && token !== "setContext") {
         config.headers = { Authorization: `Bearer ${token}` };
@@ -63,18 +74,23 @@ const PlaceOrder = () => {
       if (response.data.success && response.data.session_url) {
         window.location.replace(response.data.session_url);
       } else if (response.data.success && response.data.cod) {
-        // COD order placed — show confirmation banner (user can view orders)
         setCodConfirmation({ show: true, orderId: response.data.orderId, message: response.data.message || 'Order placed (Cash on Delivery).' });
-        // Auto-navigate to My Orders after 4 seconds
+        showToast.success('Order placed successfully!');
         setTimeout(() => {
           navigate('/myorders');
         }, 4000);
+      } else if (response.data.stripeDisabled) {
+        showToast.warning('Online payment is temporarily unavailable. Please select "Cash on Delivery" as payment method.');
       } else {
-        alert(response.data.message || 'Failed to place order. Please try again.');
+        showToast.error(response.data.message || 'Failed to place order. Please try again.');
       }
     } catch (error) {
-      console.error('Order Error:', error.response?.data || error);
-      alert(error.response?.data?.message || 'An error occurred while placing the order.');
+      if (error.response?.data?.stripeDisabled) {
+        showToast.warning('Online payment is temporarily unavailable. Please use Cash on Delivery instead.');
+        setPaymentMethod('cod');
+      } else {
+        showToast.error(error.response?.data?.message || 'An error occurred while placing the order.');
+      }
     }
   };
 
@@ -97,7 +113,7 @@ const navigate = useNavigate()
         <div className="cod-confirmation">
           <div className="cod-content">
             <div className="success-icon">✓</div>
-            <h3>🎉 Order Placed Successfully!</h3>
+            <h3>Order Placed Successfully!</h3>
             <p>{codConfirmation.message}</p>
             {codConfirmation.orderId && (
               <p className="order-id-display">
@@ -115,7 +131,7 @@ const navigate = useNavigate()
 
       <div className="place-order-container">
         <div className="place-order-header">
-          <h1>📍 Checkout</h1>
+          <h1>Checkout</h1>
           <p className="checkout-subtitle">Complete your order by providing delivery details</p>
         </div>
 
@@ -292,7 +308,7 @@ const navigate = useNavigate()
                     onChange={() => setPaymentMethod('online')}
                   />
                   <div className="payment-card">
-                    <div className="payment-icon online">💳</div>
+                    <div className="payment-icon online">Card</div>
                     <div className="payment-info">
                       <h4>Online Payment</h4>
                       <p>Pay securely with cards, UPI, wallets</p>
@@ -310,7 +326,7 @@ const navigate = useNavigate()
                     onChange={() => setPaymentMethod('cod')}
                   />
                   <div className="payment-card">
-                    <div className="payment-icon cod">💵</div>
+                    <div className="payment-icon cod">COD</div>
                     <div className="payment-info">
                       <h4>Cash on Delivery</h4>
                       <p>Pay with cash when you receive</p>

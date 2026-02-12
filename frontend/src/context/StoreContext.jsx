@@ -39,7 +39,7 @@ const StoreContextProvider = (props) => {
       const response = await axios.get(`${url}/api/food/list`);
       setFoodList(response.data.data);
     } catch (err) {
-      console.error("Error fetching food list:", err.message);
+      // Failed to fetch food list
     }
   };
 
@@ -60,11 +60,8 @@ const StoreContextProvider = (props) => {
       if (cartData) {
         setCartItems(cartData);
         localStorage.removeItem("cartItems"); // ✅ Clear local cart backup
-      } else {
-        console.warn("No cart data received from server.");
       }
     } catch (error) {
-      console.error("Failed to load cart:", error.response?.data?.message || error.message);
       if (error.response?.status === 401) {
         // Token expired or invalid
         localStorage.removeItem("token");
@@ -92,7 +89,7 @@ const StoreContextProvider = (props) => {
           }
         );
       } catch (err) {
-        console.error("Add to cart error:", err.message);
+        // Failed to add to cart
       }
     }
   };
@@ -121,7 +118,7 @@ const StoreContextProvider = (props) => {
           }
         );
       } catch (err) {
-        console.error("Remove from cart error:", err.message);
+        // Failed to remove from cart
       }
     }
   };

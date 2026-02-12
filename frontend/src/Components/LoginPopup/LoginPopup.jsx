@@ -3,10 +3,11 @@ import './LoginPopup.css';
 import { assets } from '../../assets/assets';
 import { StoreContext } from '../../context/StoreContext';
 import axios from "axios";
+import { showToast } from '../../utils/toast';
 
 const LoginPopup = ({ setShowLogin }) => {
   const { url, setToken } = useContext(StoreContext);
-  const [authMode, setAuthMode] = useState("Login"); // "Login" or "Sign Up"
+  const [authMode, setAuthMode] = useState("Login");
   const [data, setData] = useState({ name: "", email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -44,7 +45,6 @@ const LoginPopup = ({ setShowLogin }) => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -63,15 +63,15 @@ const LoginPopup = ({ setShowLogin }) => {
       const resData = response.data;
 
       if (resData.success) {
-        localStorage.setItem("token", resData.token); // ✅ Save JWT
-        setToken(resData.token);                      // ✅ Set in context
-        setShowLogin(false);                          // ✅ Close popup
+        localStorage.setItem("token", resData.token);
+        setToken(resData.token);
+        showToast.success(`Welcome ${authMode === "Login" ? "back" : "to EatSprint"}!`);
+        setShowLogin(false);
       } else {
-        alert(resData.message || "Something went wrong. Try again.");
+        showToast.error(resData.message || "Something went wrong. Try again.");
       }
     } catch (err) {
-      console.error("Auth error:", err);
-      alert(err.response?.data?.message || "Server error. Please try again.");
+      showToast.error(err.response?.data?.message || "Server error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +93,7 @@ const LoginPopup = ({ setShowLogin }) => {
       <form onSubmit={handleAuth} className={`login-popup-container ${isVisible ? 'slide-in' : ''}`}>
         <div className="login-popup-title">
           <h2>
-            {authMode === "Login" ? "🔐 Welcome Back!" : "🚀 Join Tomato"}
+            {authMode === "Login" ? "Welcome Back!" : "Join EatSprint"}
           </h2>
           <img
             onClick={handleClose}
@@ -132,7 +132,7 @@ const LoginPopup = ({ setShowLogin }) => {
                 className={errors.name ? 'error' : ''}
                 required
               />
-              <span className="input-icon">👤</span>
+              <span className="input-icon">&#128100;</span>
               {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
           )}
@@ -147,7 +147,7 @@ const LoginPopup = ({ setShowLogin }) => {
               className={errors.email ? 'error' : ''}
               required
             />
-            <span className="input-icon">📧</span>
+            <span className="input-icon">&#9993;</span>
             {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
 
@@ -161,13 +161,13 @@ const LoginPopup = ({ setShowLogin }) => {
               className={errors.password ? 'error' : ''}
               required
             />
-            <span className="input-icon">🔒</span>
+            <span className="input-icon">&#128274;</span>
             <button
               type="button"
               className="password-toggle"
               onClick={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? "Hide" : "Show"}
             </button>
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
@@ -175,9 +175,9 @@ const LoginPopup = ({ setShowLogin }) => {
 
         <button type="submit" className="auth-btn" disabled={isLoading}>
           {isLoading ? (
-            <span className="loading-spinner">⏳ Processing...</span>
+            <span className="loading-spinner">Processing...</span>
           ) : (
-            authMode === "Sign Up" ? "🎉 Create Account" : "🚀 Sign In"
+            authMode === "Sign Up" ? "Create Account" : "Sign In"
           )}
         </button>
 
@@ -188,7 +188,7 @@ const LoginPopup = ({ setShowLogin }) => {
 
         <div className="auth-switch">
           {authMode === "Login" ? (
-            <p>New to Tomato? <span onClick={() => handleModeSwitch("Sign Up")}>Create an account</span></p>
+            <p>New to EatSprint? <span onClick={() => handleModeSwitch("Sign Up")}>Create an account</span></p>
           ) : (
             <p>Already have an account? <span onClick={() => handleModeSwitch("Login")}>Sign in here</span></p>
           )}

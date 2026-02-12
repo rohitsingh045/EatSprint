@@ -66,7 +66,6 @@ const FoodItem = ({ id, name, price, description, image }) => {
           alt={name}
           onLoad={handleImageLoad}
           onError={(e) => {
-            console.error('Image load error for:', name, 'URL:', getImageUrl(image));
             e.target.style.opacity = 0.3;
           }}
           style={{
@@ -151,8 +150,6 @@ const FoodItem = ({ id, name, price, description, image }) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                // Add to favorites functionality (you can implement this)
-                console.log('Added to favorites:', name);
               }}
               style={{
                 background: 'linear-gradient(135deg, #ff6b6b, #ee5a52)',
@@ -171,33 +168,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
               onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
             >
-              ❤️
-            </button>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                // Share functionality (you can implement this)
-                console.log('Sharing:', name);
-              }}
-              style={{
-                background: 'linear-gradient(135deg, #4ecdc4, #44a08d)',
-                border: 'none',
-                borderRadius: '50%',
-                width: '30px',
-                height: '30px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.9rem',
-                transition: 'all 0.2s ease'
-              }}
-              title="Share"
-              onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
-              onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-            >
-              📤
+              &hearts;
             </button>
           </div>
         </div>
@@ -215,7 +186,7 @@ const FoodItem = ({ id, name, price, description, image }) => {
             marginTop: '10px',
             animation: 'scaleIn 0.3s ease-out'
           }}>
-            🛒 {itemCount} in cart
+            {itemCount} in cart
           </div>
         )}
       </div>

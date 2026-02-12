@@ -28,7 +28,6 @@ const Verify = () => {
       navigate("/");
     }
   } catch (error) {
-    console.error("Payment verification error:", error);
     navigate("/");
   }
 };

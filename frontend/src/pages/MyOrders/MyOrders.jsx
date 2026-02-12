@@ -5,9 +5,10 @@ import axios from 'axios';
 import { assets } from '../../assets/assets';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { showToast } from '../../utils/toast';
 
 const MyOrders = () => {
-  const { url, token } = useContext(StoreContext);
+  const { url, token, addToCart, food_list } = useContext(StoreContext);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [trackedOrderId, setTrackedOrderId] = useState(null);
@@ -21,12 +22,7 @@ const MyOrders = () => {
            s === 'cod - pending';
   };
 
-  // Cancel order handler
   const handleCancelOrder = async (orderId) => {
-    if (!window.confirm('Are you sure you want to cancel this order?')) {
-      return;
-    }
-    
     try {
       const response = await axios.post(
         `${url}/api/order/cancel`,
@@ -39,14 +35,32 @@ const MyOrders = () => {
       );
       
       if (response.data.success) {
-        alert('Order cancelled successfully');
-        fetchOrders(); // Refresh orders
+        showToast.success('Order cancelled successfully');
+        fetchOrders();
       } else {
-        alert(response.data.message || 'Failed to cancel order');
+        showToast.error(response.data.message || 'Failed to cancel order');
       }
     } catch (error) {
-      console.error('Error cancelling order:', error);
-      alert('Failed to cancel order. Please try again.');
+      showToast.error('Failed to cancel order. Please try again.');
+    }
+  };
+
+  const handleReorder = (order) => {
+    let addedCount = 0;
+    order.items.forEach((orderItem) => {
+      const foodItem = food_list.find(item => item.name === orderItem.name);
+      if (foodItem) {
+        for (let i = 0; i < orderItem.quantity; i++) {
+          addToCart(foodItem._id);
+        }
+        addedCount++;
+      }
+    });
+    
+    if (addedCount > 0) {
+      showToast.success(`${addedCount} item(s) added to cart!`);
+    } else {
+      showToast.error('Unable to add items. Products may no longer be available.');
     }
   };
 
@@ -228,8 +242,7 @@ const MyOrders = () => {
       // Save the PDF
       doc.save(`EatSprint_Invoice_${orderId}.pdf`);
     } catch (error) {
-      console.error('Error generating invoice:', error);
-      alert('Failed to generate invoice. Please try again.');
+      showToast.error('Failed to generate invoice. Please try again.');
     }
   };
 
@@ -250,11 +263,9 @@ const MyOrders = () => {
 
       if (response.data.success) {
         setData(response.data.data);
-      } else {
-        console.error("Failed to fetch orders:", response.data.message);
       }
     } catch (error) {
-      console.error("Failed to fetch orders:", error);
+      showToast.error('Failed to load orders. Please refresh the page.');
     } finally {
       setLoading(false);
     }
@@ -281,125 +292,134 @@ const MyOrders = () => {
   return (
     <div className='my-orders'>
       <div className="orders-header">
-        <h2>📦 My Orders</h2>
-        <p className="orders-subtitle">Track and manage your delicious orders</p>
+        <h2>My Orders</h2>
+        <p className="orders-subtitle">Track and manage your orders</p>
       </div>
-      <div className='container'>
+      
+      <div className='orders-container'>
         {data.length === 0 ? (
           <div className="empty-orders">
-            <div className="empty-icon">🛒</div>
-            <h3>No orders yet!</h3>
-            <p>Start shopping to place your first order</p>
+            <svg className="empty-icon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <h3>No Orders Yet</h3>
+            <p>Start ordering your favorite meals</p>
           </div>
         ) : (
           data.map((order) => (
-            <div key={order._id} className='my-orders-order'>
-              <div className="order-icon-wrapper">
-                <img src={assets.parcel_icon} alt="" />
-                <span className={`status-badge ${order.status.toLowerCase().replace(/\s+/g, '-')}`}>
+            <div key={order._id} className='order-card'>
+              <div className="order-card-header">
+                <div className="order-info">
+                  <div className="order-icon">
+                    <img src={assets.parcel_icon} alt="Order" />
+                  </div>
+                  <div>
+                    <h3 className="order-id">#{order._id.slice(-8).toUpperCase()}</h3>
+                    <p className="order-date">
+                      {new Date(order.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <span className={`status-badge status-${order.status.toLowerCase().replace(/\s+/g, '-')}`}>
                   {order.status}
                 </span>
               </div>
-              
-              <div className="order-details">
-                <div className="order-header-info">
-                  <h3 className="order-id">Order #{order._id.slice(-8).toUpperCase()}</h3>
-                  <p className="order-date">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    {new Date(order.date).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
-                  </p>
-                </div>
-                
-                <div className="order-items-wrapper">
-                  <p className="order-items">
-                    <span className="items-icon">🍽️</span>
-                    {order.items.map((item, i) => (
-                      <span key={i} className="item-tag">
-                        {item.name} × {item.quantity}
-                        {i < order.items.length - 1 ? ", " : ""}
-                      </span>
-                    ))}
-                  </p>
-                </div>
-                
-                <div className="order-footer-info">
-                  <p className="order-amount">
-                    <span className="amount-label">Total:</span>
-                    <span className="amount-value">₹{order.amount.toFixed(2)}</span>
-                  </p>
-                  <p className="payment-method">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                      <line x1="1" y1="10" x2="23" y2="10"></line>
-                    </svg>
-                    {order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment'}
-                  </p>
-                </div>
 
-                <div className="order-status">
-                  {trackedOrderId === order._id && (
-                    <div className="tracking-container">
-                      <div className="progress-steps">
-                        {(() => {
-                          const steps = [
-                            { label: 'Placed', icon: '📝' },
-                            { label: 'Confirmed', icon: '✅' },
-                            { label: 'Prepared', icon: '👨‍🍳' },
-                            { label: 'Out for delivery', icon: '🚚' },
-                            { label: 'Delivered', icon: '🎉' }
-                          ];
-                          const idx = (() => {
-                            const s = (order.status || '').toLowerCase();
-                            if (s.includes('deliver') && !s.includes('delivered')) return 3;
-                            if (s.includes('delivered')) return 4;
-                            if (s.includes('prepared')) return 2;
-                            if (s.includes('confirmed')) return 1;
-                            if (s.includes('food processing') || s.includes('placed') || s.includes('cod')) return 0;
-                            return 0;
-                          })();
-
-                          return steps.map((step, i) => (
-                            <div key={step.label} className={`step ${i <= idx ? 'done' : ''} ${i === idx ? 'active' : ''}`}>
-                              <div className="step-connector" style={{ display: i === 0 ? 'none' : 'block' }}></div>
-                              <div className="step-dot">
-                                {i <= idx ? <span className="step-icon">{step.icon}</span> : <span className="step-number">{i + 1}</span>}
-                              </div>
-                              <div className="step-label">{step.label}</div>
-                            </div>
-                          ));
-                        })()}
-                      </div>
+              <div className="order-card-body">
+                <div className="order-items-list">
+                  {order.items.map((item, i) => (
+                    <div key={i} className="order-item">
+                      <span className="item-name">{item.name}</span>
+                      <span className="item-quantity">x{item.quantity}</span>
                     </div>
-                  )}
+                  ))}
                 </div>
+
+                <div className="order-summary">
+                  <div className="summary-row">
+                    <span className="summary-label">Payment</span>
+                    <span className="summary-value">{order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online'}</span>
+                  </div>
+                  <div className="summary-row total-row">
+                    <span className="summary-label">Total Amount</span>
+                    <span className="summary-value total-amount">₹{order.amount.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {trackedOrderId === order._id && (
+                  <div className="tracking-timeline">
+                    {(() => {
+                      const steps = [
+                        { label: 'Order Placed' },
+                        { label: 'Confirmed' },
+                        { label: 'Preparing' },
+                        { label: 'Out for Delivery' },
+                        { label: 'Delivered' }
+                      ];
+                      const idx = (() => {
+                        const s = (order.status || '').toLowerCase();
+                        if (s.includes('deliver') && !s.includes('delivered')) return 3;
+                        if (s.includes('delivered')) return 4;
+                        if (s.includes('prepared') || s.includes('preparing')) return 2;
+                        if (s.includes('confirmed')) return 1;
+                        return 0;
+                      })();
+
+                      return steps.map((step, i) => (
+                        <div key={step.label} className={`timeline-step ${i <= idx ? 'completed' : ''} ${i === idx ? 'active' : ''}`}>
+                          <div className="step-indicator">
+                            <div className="step-circle">
+                              {i <= idx && (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              )}
+                            </div>
+                            {i < steps.length - 1 && <div className="step-line"></div>}
+                          </div>
+                          <span className="step-text">{step.label}</span>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                )}
               </div>
 
-              <div className="order-actions">
+              <div className="order-card-actions">
                 <button
-                  className={`track-button ${order.status.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="action-btn reorder-btn"
+                  onClick={() => handleReorder(order)}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                  Reorder
+                </button>
+                <button
+                  className={`action-btn track-btn ${order.status === 'Delivered' || order.status === 'Cancelled' ? 'disabled' : ''}`}
                   disabled={order.status === "Delivered" || order.status === "Cancelled"}
                   onClick={() => setTrackedOrderId(trackedOrderId === order._id ? null : order._id)}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                   </svg>
-                  {trackedOrderId === order._id ? 'Hide Track' : (order.status === 'Delivered' ? '✓ Delivered' : order.status === 'Cancelled' ? '✕ Cancelled' : 'Track Order')}
+                  {trackedOrderId === order._id ? 'Hide' : order.status === 'Delivered' ? 'Delivered' : order.status === 'Cancelled' ? 'Cancelled' : 'Track'}
                 </button>
                 <button
-                  className="invoice-button"
+                  className="action-btn invoice-btn"
                   onClick={() => generateInvoice(order)}
-                  title="Download Invoice"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -408,11 +428,10 @@ const MyOrders = () => {
                 </button>
                 {canCancelOrder(order.status) && order.status !== 'Cancelled' && (
                   <button
-                    className="cancel-button"
+                    className="action-btn cancel-btn"
                     onClick={() => handleCancelOrder(order._id)}
-                    title="Cancel Order"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <circle cx="12" cy="12" r="10"></circle>
                       <line x1="15" y1="9" x2="9" y2="15"></line>
                       <line x1="9" y1="9" x2="15" y2="15"></line>
